@@ -22,8 +22,8 @@ struct Packet {
 struct Parser {
     enum class State { SOF, TYPE, LEN, PAYLOAD, CHECKSUM } state = State::SOF;
     Packet  pending;
-    uint8_t cursor;
-    bool    ready;
+    uint8_t cursor = 0;
+    bool    ready  = false;
 };
 
 void feed(Parser&, uint8_t byte); // push one byte into the state machine
