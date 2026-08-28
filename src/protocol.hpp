@@ -7,7 +7,7 @@ namespace Protocol {
 
 struct Frame {
     std::array<uint8_t, 259> bytes;
-    uint8_t len;
+    uint16_t len;
 };
 
 

@@ -20,8 +20,19 @@ void Protocol::feed(Parser& parser, uint8_t byte) {
             }
             break;
         case Parser::State::TYPE:
-            parser.pending.type = static_cast<Type>(byte);
-            parser.state = Parser::State::LEN;
+            switch (byte) {
+                case static_cast<uint8_t>(Type::PING):
+                case static_cast<uint8_t>(Type::PONG):
+                case static_cast<uint8_t>(Type::DATA):
+                case static_cast<uint8_t>(Type::AT_CMD):
+                case static_cast<uint8_t>(Type::AT_RESP):
+                    parser.pending.type = static_cast<Type>(byte);
+                    parser.state = Parser::State::LEN;
+                    break;
+                default:
+                    parser.state = Parser::State::SOF;
+                    break;
+            }
             break;
         case Parser::State::LEN:
             parser.pending.len = byte;
