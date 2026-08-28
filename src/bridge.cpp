@@ -16,6 +16,12 @@ void Bridge::poll() {
             auto byteOpt = _hc12.read();
             if (!byteOpt) break; // Should not happen
             fwd.payload[fwd.len++] = *byteOpt;
+
+            // allow more time for the next byte to arrive, since the HC12 is slow
+            // note this also blocks usb packages to be handled but we don't want that while receiving data anyway
+            // since that would put the HC12 out of receive mode and cause data loss
+            delay(2.5);
+
         } while (_hc12.available() && fwd.len < 255);
         auto frame = Protocol::encode(fwd);
         _usbSerial.write(frame.bytes.data(), frame.len);
