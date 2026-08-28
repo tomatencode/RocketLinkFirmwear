@@ -27,7 +27,6 @@ void setup() {
   while (!Serial && millis() - start < 3000);
 
   hc12.sendATCommand("AT+DEFAULT");
-  Serial.println("RocketLink ready.");
 }
 
 void loop() {
