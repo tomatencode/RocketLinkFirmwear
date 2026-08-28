@@ -3,12 +3,13 @@
 
 HC12::HC12(int setPin, int rxPin, int txPin, int baudRate, std::function<void()> onSendCallback, std::function<void()> onReceiveCallback)
     : _setPin(setPin), _rxPin(rxPin), _txPin(txPin), _baudRate(baudRate), _onSendCallback(onSendCallback), _onReceiveCallback(onReceiveCallback), _serial(_rxPin, _txPin) {
-    pinMode(_setPin, OUTPUT);
-    digitalWrite(_setPin, HIGH); // default to normal mode
 }
 
 void HC12::begin() {
     _serial.begin(_baudRate);
+
+    pinMode(_setPin, OUTPUT);
+    digitalWrite(_setPin, HIGH);
 }
 
 void HC12::send(std::span<const uint8_t> data) {
@@ -32,7 +33,7 @@ uint8_t HC12::read() {
 }
 
 std::string HC12::sendATCommand(const char* command, uint32_t timeout_ms) {
-    digitalWrite(_setPin, LOW); // enter AT mode
+    digitalWrite(_setPin, LOW);
     delay(100); // wait for the module to enter AT mode
 
     // Clear any existing data in the serial buffer
@@ -52,7 +53,7 @@ std::string HC12::sendATCommand(const char* command, uint32_t timeout_ms) {
         }
     }
 
-    digitalWrite(_setPin, HIGH); // exit AT mode
+    digitalWrite(_setPin, HIGH);
     delay(100); // wait for the module to exit AT mode
 
     return response;

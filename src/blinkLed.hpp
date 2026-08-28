@@ -3,12 +3,15 @@
 
 class BlinkLed {
 public:
-    BlinkLed(int pin, int onDuration_ms, double brightness);
+    BlinkLed(int pin, int onDuration_ms, float brightness);
+
+    void begin();
+
     void update();
     void flash();
 private:
     int _pin;
     int _onDuration_ms;
-    double _brightness;
-    uint32_t _ledOff = 0;
+    float _brightness;
+    uint32_t _flashtime = 0;
 };

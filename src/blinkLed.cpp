@@ -1,9 +1,13 @@
 #include <Arduino.h>
 #include "blinkLed.hpp"
 
-BlinkLed::BlinkLed(int pin, int onDuration_ms, double brightness)
+BlinkLed::BlinkLed(int pin, int onDuration_ms, float brightness)
     : _pin(pin), _onDuration_ms(onDuration_ms), _brightness(brightness) {
+}
+
+void BlinkLed::begin() {
     pinMode(_pin, OUTPUT);
+    analogWrite(_pin, 0);
 }
 
 void BlinkLed::update() {

@@ -2,14 +2,12 @@
 #include <cstring>
 
 void Bridge::poll() {
-    // USB → protocol parser → dispatch
     while (_usbSerial.available()) {
         Protocol::feed(_parser, _usbSerial.read());
         auto packetOpt = Protocol::take(_parser);
         if (packetOpt) handlePacket(*packetOpt);
     }
 
-    // HC12 RF → wrap in DATA frame → USB
     while (_hc12.available()) {
         Protocol::Packet fwd;
         fwd.type = Protocol::Type::DATA;
@@ -23,10 +21,8 @@ void Bridge::poll() {
 }
 
 void Bridge::handlePacket(const Protocol::Packet& packet) {
-    // Handle the received packet based on its type
     switch (packet.type) {
         case Protocol::Type::PING:
-            // Respond with PONG
             {
                 Protocol::Packet response;
 
@@ -40,16 +36,13 @@ void Bridge::handlePacket(const Protocol::Packet& packet) {
             }
             break;
         case Protocol::Type::DATA:
-            // forward raw payload to HC12 over RF
             _hc12.send({packet.payload, packet.len});
             break;
         case Protocol::Type::AT_CMD:
-            // Handle AT command packet
-            // For example, send the command to the HC12 module and respond with the result
             {
                 std::string command(reinterpret_cast<const char*>(packet.payload), packet.len);
                 std::string response = _hc12.sendATCommand(command.c_str());
-                
+
                 if (response.size() > 255) {
                     response.resize(255);
                 }
@@ -64,7 +57,7 @@ void Bridge::handlePacket(const Protocol::Packet& packet) {
             }
             break;
         default:
-            // Unknown packet type, ignore or handle as needed
+            // Unknown packet type ignore
             break;
     }
 }

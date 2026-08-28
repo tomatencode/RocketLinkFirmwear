@@ -22,6 +22,8 @@ Bridge bridge(hc12, Serial);
 void setup() {
   Serial.begin(9600);
   hc12.begin();
+  txLed.begin();
+  rxLed.begin();
   
   uint32_t start = millis();
   while (!Serial && millis() - start < 3000);
