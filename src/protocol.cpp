@@ -1,5 +1,14 @@
 #include "protocol.hpp"
 
+uint8_t crc8(const Protocol::Packet& packet) {
+    uint8_t crc = 0;
+    crc ^= static_cast<uint8_t>(packet.type);
+    crc ^= packet.len;
+    for (uint8_t i = 0; i < packet.len; ++i) {
+        crc ^= packet.payload[i];
+    }
+    return crc;
+}
 
 void Protocol::feed(Parser& parser, uint8_t byte) {
     switch (parser.state) {
@@ -19,16 +28,16 @@ void Protocol::feed(Parser& parser, uint8_t byte) {
             if (byte > 0) {
                 parser.state = Parser::State::PAYLOAD;
             } else {
-                parser.state = Parser::State::CRC;
+                parser.state = Parser::State::CHECKSUM;
             }
             break;
         case Parser::State::PAYLOAD:
             parser.pending.payload[parser.cursor++] = byte;
             if (parser.cursor >= parser.pending.len) {
-                parser.state = Parser::State::CRC;
+                parser.state = Parser::State::CHECKSUM;
             }
             break;
-        case Parser::State::CRC:
+        case Parser::State::CHECKSUM:
             if (byte == crc8(parser.pending)) {
                 parser.ready = true;
             }
@@ -57,15 +66,4 @@ Protocol::Frame Protocol::encode(const Packet& packet) {
     frame.bytes[3 + packet.len] = crc8(packet);
     frame.len = 4 + packet.len; // SOF + TYPE + LEN + PAYLOAD + CRC
     return frame;
-}
-
-
-uint8_t crc8(const Protocol::Packet& packet) {
-    uint8_t crc = 0;
-    crc ^= static_cast<uint8_t>(packet.type);
-    crc ^= packet.len;
-    for (uint8_t i = 0; i < packet.len; ++i) {
-        crc ^= packet.payload[i];
-    }
-    return crc;
 }

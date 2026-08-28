@@ -20,7 +20,7 @@ struct Packet {
 };
 
 struct Parser {
-    enum class State { SOF, TYPE, LEN, PAYLOAD, CRC } state = State::SOF;
+    enum class State { SOF, TYPE, LEN, PAYLOAD, CHECKSUM } state = State::SOF;
     Packet  pending;
     uint8_t cursor;
     bool    ready;
