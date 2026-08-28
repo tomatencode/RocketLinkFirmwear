@@ -1,4 +1,4 @@
-#include "Protocol.hpp"
+#include "protocol.hpp"
 
 
 void Protocol::feed(Parser& parser, uint8_t byte) {
