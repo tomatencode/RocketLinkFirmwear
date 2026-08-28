@@ -47,6 +47,9 @@ std::string HC12::sendATCommand(const char* command, uint32_t timeout_ms) {
         if (_serial.available()) {
             response += static_cast<char>(_serial.read());
         }
+        if (response.size() >= 2 && response[response.size() - 2] == '\r' && response.back() == '\n') {
+            break; // End of response
+        }
     }
 
     digitalWrite(_setPin, HIGH); // exit AT mode
