@@ -13,7 +13,9 @@ void Bridge::poll() {
         fwd.type = Protocol::Type::DATA;
         fwd.len = 0;
         do {
-            fwd.payload[fwd.len++] = _hc12.read();
+            auto byteOpt = _hc12.read();
+            if (!byteOpt) break; // Should not happen
+            fwd.payload[fwd.len++] = *byteOpt;
         } while (_hc12.available() && fwd.len < 255);
         auto frame = Protocol::encode(fwd);
         _usbSerial.write(frame.bytes.data(), frame.len);

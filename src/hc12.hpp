@@ -4,6 +4,7 @@
 #include <functional>
 #include <span>
 #include <string>
+#include <optional>
 
 
 class HC12 {
@@ -20,7 +21,7 @@ public:
     
     void send(std::span<const uint8_t> data);
     bool available();
-    uint8_t read();
+    std::optional<uint8_t> read();
 
     std::string sendATCommand(const char* command, uint32_t timeout_ms = 200);
 private:

@@ -25,8 +25,11 @@ bool HC12::available() {
     return _serial.available() > 0;
 }
 
-uint8_t HC12::read() {
-    if (available() && _onReceiveCallback) {
+std::optional<uint8_t> HC12::read() {
+    if (!available()) {
+        return std::nullopt;
+    }
+    if (_onReceiveCallback) {
         _onReceiveCallback();
     }
     return _serial.read();
