@@ -11,7 +11,7 @@ void BlinkLed::begin() {
 }
 
 void BlinkLed::update() {
-    if (millis() >= _flashtime + _onDuration_ms) {
+    if (millis() - _flashtime >= _onDuration_ms) {
         analogWrite(_pin, 0);
     }
 }
