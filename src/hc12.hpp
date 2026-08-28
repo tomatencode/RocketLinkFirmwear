@@ -1,7 +1,8 @@
 #pragma once
 #include <cstdint>
-#include <string>
+#include <functional>
 #include <span>
+#include <string>
 
 
 class HC12 {

@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "blinkLed.hpp"
 
 BlinkLed::BlinkLed(int pin, int onDuration_ms, double brightness)
