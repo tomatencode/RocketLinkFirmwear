@@ -20,11 +20,6 @@ HC12 hc12(HC12_SET_PIN, PA10, PA9, 9600,
 Bridge bridge(hc12, Serial);
 
 void setup() {
-  pinMode(LED_TX_PIN, OUTPUT);
-  pinMode(LED_RX_PIN, OUTPUT);
-  pinMode(HC12_SET_PIN, OUTPUT);
-  digitalWrite(HC12_SET_PIN, HIGH);
-
   Serial.begin(9600);
   hc12.begin();
   
