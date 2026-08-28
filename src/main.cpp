@@ -20,7 +20,7 @@ HC12 hc12(HC12_SET_PIN, PA10, PA9, 9600,
 Bridge bridge(hc12, Serial);
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin();
   hc12.begin();
   txLed.begin();
   rxLed.begin();
