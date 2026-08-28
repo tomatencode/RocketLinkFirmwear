@@ -9,8 +9,8 @@
 #define HC12_SET_PIN PA8
 
 
-BlinkLed txLed(LED_TX_PIN, 30, 0.15);
-BlinkLed rxLed(LED_RX_PIN, 30, 1.0);
+BlinkLed txLed(LED_TX_PIN, 30, 35);
+BlinkLed rxLed(LED_RX_PIN, 30, 255);
 
 HC12 hc12(HC12_SET_PIN, PA10, PA9, 9600,
     []() { txLed.flash(); }, // onSendCallback

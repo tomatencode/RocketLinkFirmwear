@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "blinkLed.hpp"
 
-BlinkLed::BlinkLed(int pin, int onDuration_ms, float brightness)
+BlinkLed::BlinkLed(int pin, int onDuration_ms, uint8_t brightness)
     : _pin(pin), _onDuration_ms(onDuration_ms), _brightness(brightness) {
 }
 
@@ -17,6 +17,6 @@ void BlinkLed::update() {
 }
 
 void BlinkLed::flash() {
-    analogWrite(_pin, (int)(255 * _brightness));
+    analogWrite(_pin, _brightness);
     _flashtime = millis();
 }
