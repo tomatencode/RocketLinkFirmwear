@@ -50,6 +50,10 @@ void Bridge::handlePacket(const Protocol::Packet& packet) {
                 std::string command(reinterpret_cast<const char*>(packet.payload), packet.len);
                 std::string response = _hc12.sendATCommand(command.c_str());
                 
+                if (response.size() > 255) {
+                    response.resize(255);
+                }
+                
                 Protocol::Packet responsePacket;
                 responsePacket.type = Protocol::Type::AT_RESP;
                 responsePacket.len = static_cast<uint8_t>(response.size());
