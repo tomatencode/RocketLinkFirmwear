@@ -52,7 +52,7 @@ std::string HC12::sendATCommand(const char* command, uint32_t timeout_ms) {
             response += static_cast<char>(_serial.read());
         }
         if (response.size() >= 2 && response[response.size() - 2] == '\r' && response.back() == '\n') {
-            break; // End of response
+            break; // End of response (assumes all are single line responses)
         }
     }
 
