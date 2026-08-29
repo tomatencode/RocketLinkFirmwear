@@ -13,5 +13,9 @@ private:
     Stream& _usbSerial;
     Protocol::Parser _parser;
 
+    size_t _radioReceveBufferSize = 0;
+    std::array<uint8_t, 1024> _radioBuffer;
+
     void handlePacket(const Protocol::Packet&);
+    void sendPackedUsb(const Protocol::Packet& packet);
 };
