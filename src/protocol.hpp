@@ -11,12 +11,7 @@ struct Frame {
 };
 
 
-enum class Type : uint8_t {
-    PING=0x01, PONG=0x02,
-    SEND_RADIO_REQ=0x10, SEND_RADIO_ACK=0x11,
-    RECEIVE_RADIO_REQ=0x12, RECEIVE_RADIO_RESP=0x13,
-    AT_CMD=0x20, AT_RESP=0x21
-};
+enum class Type : uint8_t { PING=0x01, PONG=0x02, DATA=0x10, AT_CMD=0x20, AT_RESP=0x21 };
 
 struct Packet {
     Type    type;
