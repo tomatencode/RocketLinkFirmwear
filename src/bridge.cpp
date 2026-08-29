@@ -20,7 +20,10 @@ void Bridge::poll() {
             // allow more time for the next byte to arrive, since the HC12 is slow
             // note this also blocks usb packages to be handled but we don't want that while receiving data anyway
             // since that would put the HC12 out of receive mode and cause data loss
-            delay(2.5);
+            uint32_t start = millis();
+            while (millis() - start < 3) {
+                if (_hc12.available()) break;
+            }
 
         } while (_hc12.available() && fwd.len < 255);
         auto frame = Protocol::encode(fwd);
