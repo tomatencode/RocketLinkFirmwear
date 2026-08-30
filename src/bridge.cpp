@@ -47,7 +47,16 @@ void Bridge::handlePacket(const Protocol::Packet& packet) {
             }
             break;
         case Protocol::Type::RADIO_SEND:
-            _hc12.send({packet.payload, packet.len});
+            {
+                _hc12.send({packet.payload, packet.len});
+
+                Protocol::Packet responsePacket;
+                responsePacket.type = Protocol::Type::RADIO_SEND_ACK;
+                responsePacket.len = 0;
+                
+                auto frame = Protocol::encode(responsePacket);
+                _usbSerial.write(frame.bytes.data(), frame.len);
+            }
             break;
         case Protocol::Type::AT_CMD:
             {
