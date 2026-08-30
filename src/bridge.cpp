@@ -1,5 +1,4 @@
 #include "bridge.hpp"
-#include <cstring>
 
 void Bridge::poll() {
     while (_usbSerial.available()) {
@@ -36,11 +35,8 @@ void Bridge::handlePacket(const Protocol::Packet& packet) {
         case Protocol::Type::PING:
             {
                 Protocol::Packet response;
-
                 response.type = Protocol::Type::PONG;
-                const char* magic = "RocketLink";
-                response.len = static_cast<uint8_t>(strlen(magic));
-                memcpy(response.payload, magic, response.len);
+                response.len = 0;
 
                 auto frame = Protocol::encode(response);
                 _usbSerial.write(frame.bytes.data(), frame.len);
