@@ -1,12 +1,23 @@
 #include "protocol.hpp"
 
+// CRC-8/SMBUS, poly 0x07
+static const uint8_t CRC8_TABLE[256] = [] {
+    uint8_t table[256];
+    for (int i = 0; i < 256; i++) {
+        uint8_t crc = i;
+        for (int bit = 0; bit < 8; bit++)
+            crc = (crc & 0x80) ? (crc << 1) ^ 0x07 : crc << 1;
+        table[i] = crc;
+    }
+    return table;
+}();
+
 uint8_t crc8(const Protocol::Packet& packet) {
     uint8_t crc = 0;
-    crc ^= static_cast<uint8_t>(packet.type);
-    crc ^= packet.len;
-    for (uint8_t i = 0; i < packet.len; ++i) {
-        crc ^= packet.payload[i];
-    }
+    crc = CRC8_TABLE[crc ^ static_cast<uint8_t>(packet.type)];
+    crc = CRC8_TABLE[crc ^ packet.len];
+    for (uint8_t i = 0; i < packet.len; ++i)
+        crc = CRC8_TABLE[crc ^ packet.payload[i]];
     return crc;
 }
 
