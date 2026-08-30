@@ -15,8 +15,8 @@ enum class Type : uint8_t {
     PING=0x01,
     PONG=0x02,
     RADIO_SEND=0x10,
-    RADIO_SEND_ACK=0x11,
-    RADIO_RECEIVE=0x12,
+    RADIO_SEND_QUEUED=0x11,
+    RADIO_RECEIVED=0x12,
     AT_CMD=0x20,
     AT_RESP=0x21
 };

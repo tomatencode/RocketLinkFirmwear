@@ -47,7 +47,7 @@ void Bridge::handlePacket(const Protocol::Packet& packet) {
                 _hc12.send({packet.payload, packet.len});
 
                 Protocol::Packet responsePacket;
-                responsePacket.type = Protocol::Type::RADIO_SEND_ACK;
+                responsePacket.type = Protocol::Type::RADIO_SEND_QUEUED;
                 responsePacket.len = 0;
                 
                 auto frame = Protocol::encode(responsePacket);
