@@ -9,7 +9,7 @@ void Bridge::poll() {
 
     while (_hc12.available()) {
         Protocol::Packet fwd;
-        fwd.type = Protocol::Type::RADIO_RECEIVE;
+        fwd.type = Protocol::Type::RADIO_RECEIVED;
         fwd.len = 0;
         do {
             auto byteOpt = _hc12.read();
