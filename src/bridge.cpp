@@ -10,7 +10,7 @@ void Bridge::poll() {
 
     while (_hc12.available()) {
         Protocol::Packet fwd;
-        fwd.type = Protocol::Type::DATA;
+        fwd.type = Protocol::Type::RADIO_RECEIVE;
         fwd.len = 0;
         do {
             auto byteOpt = _hc12.read();
@@ -46,7 +46,7 @@ void Bridge::handlePacket(const Protocol::Packet& packet) {
                 _usbSerial.write(frame.bytes.data(), frame.len);
             }
             break;
-        case Protocol::Type::DATA:
+        case Protocol::Type::RADIO_SEND:
             _hc12.send({packet.payload, packet.len});
             break;
         case Protocol::Type::AT_CMD:
