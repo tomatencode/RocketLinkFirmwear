@@ -1,16 +1,17 @@
 #include "protocol.hpp"
 
 // CRC-8/SMBUS, poly 0x07
-static const uint8_t CRC8_TABLE[256] = [] {
-    uint8_t table[256];
+static constexpr std::array<uint8_t, 256> make_crc8_table() {
+    std::array<uint8_t, 256> table{};
     for (int i = 0; i < 256; i++) {
-        uint8_t crc = i;
+        uint8_t crc = static_cast<uint8_t>(i);
         for (int bit = 0; bit < 8; bit++)
             crc = (crc & 0x80) ? (crc << 1) ^ 0x07 : crc << 1;
         table[i] = crc;
     }
     return table;
-}();
+}
+static constexpr auto CRC8_TABLE = make_crc8_table();
 
 uint8_t crc8(const Protocol::Packet& packet) {
     uint8_t crc = 0;
