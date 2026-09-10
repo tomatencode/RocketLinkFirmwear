@@ -5,8 +5,10 @@
 
 namespace Protocol {
 
+static constexpr uint16_t max_payload_size = 1024;
+
 struct Frame {
-    std::array<uint8_t, 259> bytes;
+    std::array<uint8_t, 5 + max_payload_size> bytes;
     uint16_t len;
 };
 
@@ -23,20 +25,20 @@ enum class Type : uint8_t {
 
 struct Packet {
     Type    type;
-    uint8_t len;
-    uint8_t payload[255];
+    uint16_t len;
+    uint8_t payload[max_payload_size];
 };
 
 struct Parser {
-    enum class State { SOF, TYPE, LEN, PAYLOAD, CHECKSUM } state = State::SOF;
+    enum class State { SOF, TYPE, LEN_LOW, LEN_HIGH, PAYLOAD, CHECKSUM } state = State::SOF;
     Packet  pending;
-    uint8_t cursor = 0;
+    uint16_t cursor = 0;
     bool    ready  = false;
 };
 
 void feed(Parser&, uint8_t byte); // push one byte into the state machine
 std::optional<Packet> take(Parser&);
 
-Frame encode(const Packet& packet);
+std::optional<Frame> encode(const Packet& packet);
 
 } // namespace Protocol

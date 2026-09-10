@@ -24,9 +24,12 @@ void Bridge::poll() {
                 if (_hc12.available()) break;
             }
 
-        } while (_hc12.available() && fwd.len < 255);
+        } while (_hc12.available() && fwd.len < Protocol::max_payload_size);
+        
         auto frame = Protocol::encode(fwd);
-        _usbSerial.write(frame.bytes.data(), frame.len);
+        if (frame) {
+            _usbSerial.write(frame->bytes.data(), frame->len);
+        }
     }
 }
 
@@ -39,7 +42,9 @@ void Bridge::handlePacket(const Protocol::Packet& packet) {
                 response.len = 0;
 
                 auto frame = Protocol::encode(response);
-                _usbSerial.write(frame.bytes.data(), frame.len);
+                if (frame) {
+                    _usbSerial.write(frame->bytes.data(), frame->len);
+                }
             }
             break;
         case Protocol::Type::RADIO_SEND:
@@ -51,7 +56,9 @@ void Bridge::handlePacket(const Protocol::Packet& packet) {
                 responsePacket.len = 0;
                 
                 auto frame = Protocol::encode(responsePacket);
-                _usbSerial.write(frame.bytes.data(), frame.len);
+                if (frame) {
+                    _usbSerial.write(frame->bytes.data(), frame->len);
+                }
             }
             break;
         case Protocol::Type::AT_CMD:
@@ -59,17 +66,19 @@ void Bridge::handlePacket(const Protocol::Packet& packet) {
                 std::string command(reinterpret_cast<const char*>(packet.payload), packet.len);
                 std::string response = _hc12.sendATCommand(command.c_str());
 
-                if (response.size() > 255) {
-                    response.resize(255);
+                if (response.size() > Protocol::max_payload_size) {
+                    response.resize(Protocol::max_payload_size);
                 }
                 
                 Protocol::Packet responsePacket;
                 responsePacket.type = Protocol::Type::AT_RESP;
-                responsePacket.len = static_cast<uint8_t>(response.size());
+                responsePacket.len = static_cast<uint16_t>(response.size());
                 std::copy(response.begin(), response.end(), responsePacket.payload);
                 
                 auto frame = Protocol::encode(responsePacket);
-                _usbSerial.write(frame.bytes.data(), frame.len);
+                if (frame) {
+                    _usbSerial.write(frame->bytes.data(), frame->len);
+                }
             }
             break;
         default:

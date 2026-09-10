@@ -16,8 +16,9 @@ static constexpr auto CRC8_TABLE = make_crc8_table();
 uint8_t crc8(const Protocol::Packet& packet) {
     uint8_t crc = 0;
     crc = CRC8_TABLE[crc ^ static_cast<uint8_t>(packet.type)];
-    crc = CRC8_TABLE[crc ^ packet.len];
-    for (uint8_t i = 0; i < packet.len; ++i)
+    crc = CRC8_TABLE[crc ^ static_cast<uint8_t>(packet.len & 0xFF)];
+    crc = CRC8_TABLE[crc ^ static_cast<uint8_t>(packet.len >> 8)];
+    for (uint16_t i = 0; i < packet.len; ++i)
         crc = CRC8_TABLE[crc ^ packet.payload[i]];
     return crc;
 }
@@ -41,16 +42,24 @@ void Protocol::feed(Parser& parser, uint8_t byte) {
                 case static_cast<uint8_t>(Type::AT_CMD):
                 case static_cast<uint8_t>(Type::AT_RESP):
                     parser.pending.type = static_cast<Type>(byte);
-                    parser.state = Parser::State::LEN;
+                    parser.state = Parser::State::LEN_LOW;
                     break;
                 default:
                     parser.state = Parser::State::SOF;
                     break;
             }
             break;
-        case Parser::State::LEN:
+        case Parser::State::LEN_LOW:
             parser.pending.len = byte;
-            if (byte > 0) {
+            parser.state = Parser::State::LEN_HIGH;
+            break;
+        case Parser::State::LEN_HIGH:
+            parser.pending.len |= static_cast<uint16_t>(byte) << 8;
+            if (parser.pending.len > max_payload_size) {
+                parser.state = Parser::State::SOF; // Reset on error
+                break;
+            }
+            if (parser.pending.len > 0) {
                 parser.state = Parser::State::PAYLOAD;
             } else {
                 parser.state = Parser::State::CHECKSUM;
@@ -80,15 +89,19 @@ std::optional<Protocol::Packet> Protocol::take(Parser& parser) {
 }
 
 
-Protocol::Frame Protocol::encode(const Packet& packet) {
+std::optional<Protocol::Frame> Protocol::encode(const Packet& packet) {
+    if (packet.len > max_payload_size) {
+        return std::nullopt;
+    }
     Frame frame;
     frame.bytes[0] = 0xAA; // Start of Frame
     frame.bytes[1] = static_cast<uint8_t>(packet.type);
-    frame.bytes[2] = packet.len;
-    for (uint8_t i = 0; i < packet.len; ++i) {
-        frame.bytes[3 + i] = packet.payload[i];
+    frame.bytes[2] = static_cast<uint8_t>(packet.len & 0xFF);
+    frame.bytes[3] = static_cast<uint8_t>((packet.len >> 8) & 0xFF);
+    for (uint16_t i = 0; i < packet.len; ++i) {
+        frame.bytes[4 + i] = packet.payload[i];
     }
-    frame.bytes[3 + packet.len] = crc8(packet);
-    frame.len = 4 + packet.len; // SOF + TYPE + LEN + PAYLOAD + CRC
+    frame.bytes[4 + packet.len] = crc8(packet);
+    frame.len = 5 + packet.len; // SOF + TYPE + LEN_LOW + LEN_HIGH + PAYLOAD + CRC
     return frame;
 }
