@@ -69,10 +69,10 @@ void Bridge::handlePacket(const Protocol::Packet& packet) {
             break;
         case Protocol::Type::RADIO_SEND:
             {
-                _hc12.send({packet.payload, packet.len});
+                boolean success = _hc12.send({packet.payload, packet.len});
 
                 Protocol::Packet responsePacket;
-                responsePacket.type = Protocol::Type::RADIO_SEND_QUEUED;
+                responsePacket.type = success ? Protocol::Type::RADIO_SEND_QUEUED : Protocol::Type::RADIO_SEND_FAILED;
                 responsePacket.len = 0;
                 
                 auto frame = Protocol::encode(responsePacket);
@@ -87,7 +87,7 @@ void Bridge::handlePacket(const Protocol::Packet& packet) {
                 bool success = _hc12.sendATCommand(command.c_str());
                 if (!success) {
                     Protocol::Packet responsePacket;
-                    responsePacket.type = Protocol::Type::AT_CMD_FAILED;
+                    responsePacket.type = Protocol::Type::AT_CMD_SEND_FAILED;
                     responsePacket.len = 0;
 
                     auto frame = Protocol::encode(responsePacket);

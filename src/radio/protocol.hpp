@@ -18,10 +18,11 @@ enum class Type : uint8_t {
     PONG=0x02,
     RADIO_SEND=0x10,
     RADIO_SEND_QUEUED=0x11,
-    RADIO_RECEIVED=0x12,
+    RADIO_SEND_FAILED=0x12,
+    RADIO_RECEIVED=0x15,
     AT_CMD=0x20,
     AT_RESP=0x21,
-    AT_CMD_FAILED=0x22,
+    AT_CMD_SEND_FAILED=0x22,
 };
 
 struct Packet {

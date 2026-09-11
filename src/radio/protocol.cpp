@@ -38,9 +38,11 @@ void Protocol::feed(Parser& parser, uint8_t byte) {
                 case static_cast<uint8_t>(Type::PONG):
                 case static_cast<uint8_t>(Type::RADIO_SEND):
                 case static_cast<uint8_t>(Type::RADIO_SEND_QUEUED):
+                case static_cast<uint8_t>(Type::RADIO_SEND_FAILED):
                 case static_cast<uint8_t>(Type::RADIO_RECEIVED):
                 case static_cast<uint8_t>(Type::AT_CMD):
                 case static_cast<uint8_t>(Type::AT_RESP):
+                case static_cast<uint8_t>(Type::AT_CMD_SEND_FAILED):
                     parser.pending.type = static_cast<Type>(byte);
                     parser.state = Parser::State::LEN_LOW;
                     break;
