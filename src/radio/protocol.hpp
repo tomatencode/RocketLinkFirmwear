@@ -20,7 +20,8 @@ enum class Type : uint8_t {
     RADIO_SEND_QUEUED=0x11,
     RADIO_RECEIVED=0x12,
     AT_CMD=0x20,
-    AT_RESP=0x21
+    AT_RESP=0x21,
+    AT_CMD_FAILED=0x22,
 };
 
 struct Packet {

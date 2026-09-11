@@ -2,7 +2,7 @@
 #include "hc12.hpp"
 
 HC12::HC12(int setPin, int rxPin, int txPin, int baudRate, std::function<void()> onSendCallback, std::function<void()> onReceiveCallback)
-    : _setPin(setPin), _rxPin(rxPin), _txPin(txPin), _baudRate(baudRate), _onSendCallback(onSendCallback), _onReceiveCallback(onReceiveCallback), _serial(_rxPin, _txPin) {
+    : _setPin(setPin), _rxPin(rxPin), _txPin(txPin), _baudRate(baudRate), _onSendCallback(onSendCallback), _onReceiveCallback(onReceiveCallback), _serial(_rxPin, _txPin), _atState(ATState::IDLE) {
 }
 
 void HC12::begin() {
@@ -35,16 +35,19 @@ std::optional<uint8_t> HC12::read() {
     return _serial.read();
 }
 
-void HC12::sendATCommand(const char* command, uint32_t timeout_ms) {
+bool HC12::sendATCommand(const char* command, uint32_t timeout_ms) {
+    if (atBusy()) {
+        return false;
+    }
+
     _atCommand = command;
     _atResponse.clear();
     _atStartStepTime = millis();
     _atTimeout = timeout_ms;
-    
 
     digitalWrite(_setPin, LOW);
-
     _atState = ATState::ENTERING_AT_MODE;
+    return true;
 }
 
 void HC12::update() {
@@ -65,8 +68,15 @@ void HC12::update() {
             while (_serial.available()) {
                 _atResponse += static_cast<char>(_serial.read());
             }
-            if (_atResponse.size() >= 2 && _atResponse[_atResponse.size() - 2] == '\r' && _atResponse.back() == '\n'
-                || millis() - _atStartStepTime > _atTimeout) {
+
+            const bool responseComplete =
+                _atResponse.size() >= 2 &&
+                _atResponse[_atResponse.size() - 2] == '\r' &&
+                _atResponse.back() == '\n';
+            const bool timedOut =
+                millis() - _atStartStepTime > _atTimeout;
+
+            if (responseComplete || timedOut) {
                 _atStartStepTime = millis();
                 digitalWrite(_setPin, HIGH);
                 _atState = ATState::EXITING_AT_MODE;

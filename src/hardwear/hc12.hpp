@@ -24,7 +24,7 @@ public:
     bool available();
     std::optional<uint8_t> read();
 
-    void sendATCommand(const char* command, uint32_t timeout_ms = 200);
+    bool sendATCommand(const char* command, uint32_t timeout_ms = 200);
     bool atBusy();
     bool atDone();
     std::optional<std::string> takeATResponse();
