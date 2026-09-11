@@ -9,6 +9,7 @@
 
 class HC12 {
 public:
+
     HC12(int setPin,
          int rxPin,
          int txPin,
@@ -23,8 +24,16 @@ public:
     bool available();
     std::optional<uint8_t> read();
 
-    std::string sendATCommand(const char* command, uint32_t timeout_ms = 200);
+    void sendATCommand(const char* command, uint32_t timeout_ms = 200);
+    bool atBusy();
+    bool atDone();
+    std::optional<std::string> takeATResponse();
+
+    void update();
+
 private:
+    enum class ATState { IDLE, ENTERING_AT_MODE, AWAITING_RESPONSE, EXITING_AT_MODE, DONE, };
+
     int _setPin;
     int _rxPin;
     int _txPin;
@@ -35,4 +44,10 @@ private:
 
     std::function<void()> _onSendCallback;
     std::function<void()> _onReceiveCallback;
+
+    ATState _atState;
+    uint32_t _atStartStepTime;
+    uint32_t _atTimeout;
+    std::string _atCommand;
+    std::string _atResponse;
 };

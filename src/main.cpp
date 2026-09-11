@@ -1,8 +1,8 @@
 #include <Arduino.h>
 
-#include "blinkLed.hpp"
-#include "hc12.hpp"
-#include "bridge.hpp"
+#include "hardwear/blinkLed.hpp"
+#include "hardwear/hc12.hpp"
+#include "radio/bridge.hpp"
 
 #define LED_TX_PIN PB6
 #define LED_RX_PIN PB7
@@ -34,5 +34,6 @@ void setup() {
 void loop() {
   txLed.update();
   rxLed.update();
+  hc12.update();
   bridge.poll();
 }

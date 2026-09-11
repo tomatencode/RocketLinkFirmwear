@@ -1,5 +1,5 @@
 #pragma once
-#include "hc12.hpp"
+#include "../hardwear/hc12.hpp"
 #include "protocol.hpp"
 #include <Arduino.h>
 
