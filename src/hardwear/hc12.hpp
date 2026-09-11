@@ -20,7 +20,7 @@ public:
 
     void begin();
     
-    void send(std::span<const uint8_t> data);
+    bool send(std::span<const uint8_t> data);
     bool available();
     std::optional<uint8_t> read();
 

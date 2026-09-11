@@ -12,20 +12,30 @@ void HC12::begin() {
     digitalWrite(_setPin, HIGH);
 }
 
-void HC12::send(std::span<const uint8_t> data) {
+bool HC12::send(std::span<const uint8_t> data) {
+    if (atBusy()) {
+        return false;
+    }
     if (_onSendCallback && data.size() > 0) {
         _onSendCallback();
     }
     for (auto byte : data) {
         _serial.write(byte);
     }
+    return true;
 }
 
 bool HC12::available() {
+    if (atBusy()) {
+        return false;
+    }
     return _serial.available() > 0;
 }
 
 std::optional<uint8_t> HC12::read() {
+    if (atBusy()) {
+        return std::nullopt;
+    }
     if (!available()) {
         return std::nullopt;
     }
@@ -36,7 +46,7 @@ std::optional<uint8_t> HC12::read() {
 }
 
 bool HC12::sendATCommand(const char* command, uint32_t timeout_ms) {
-    if (atBusy()) {
+    if (_atState != ATState::IDLE) {
         return false;
     }
 
@@ -53,9 +63,8 @@ bool HC12::sendATCommand(const char* command, uint32_t timeout_ms) {
 void HC12::update() {
     switch (_atState) {
         case HC12::ATState::IDLE:
-            // Do nothing
-            break;
-        case HC12::ATState::ENTERING_AT_MODE:
+            break; // Do nothing
+        case HC12::ATState::ENTERING_AT_MODE: {
             if (millis() - _atStartStepTime > 100) { // wait for the module to enter AT mode
                 _atStartStepTime = millis();
                 _atState = ATState::AWAITING_RESPONSE;
@@ -64,7 +73,8 @@ void HC12::update() {
                 _serial.print("\r\n");
             }
             break;
-        case HC12::ATState::AWAITING_RESPONSE:
+        }
+        case HC12::ATState::AWAITING_RESPONSE: {
             while (_serial.available()) {
                 _atResponse += static_cast<char>(_serial.read());
             }
@@ -82,14 +92,15 @@ void HC12::update() {
                 _atState = ATState::EXITING_AT_MODE;
             }
             break;
-        case HC12::ATState::EXITING_AT_MODE:
+        }
+        case HC12::ATState::EXITING_AT_MODE:{
             if (millis() - _atStartStepTime > 100) { // wait for the module to exit AT mode
                 _atState = ATState::DONE;
             }
             break;
+        }
         case HC12::ATState::DONE:
-            // gets reset to IDLE on takeAtResponse
-            break;
+            break; // gets reset to IDLE on takeAtResponse
     }
 }
 
