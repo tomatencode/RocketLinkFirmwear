@@ -1,8 +1,8 @@
 #include <Arduino.h>
 
-#include "hardwear/blinkLed.hpp"
-#include "hardwear/hc12.hpp"
-#include "radio/bridge.hpp"
+#include "hardwear/BlinkLed.hpp"
+#include "hardwear/HC12.hpp"
+#include "radio/Bridge.hpp"
 
 #define LED_TX_PIN PB6
 #define LED_RX_PIN PB7
