@@ -1,4 +1,4 @@
-#include "protocol.hpp"
+#include "Protocol.hpp"
 
 // CRC-8/SMBUS, poly 0x07
 static constexpr std::array<uint8_t, 256> make_crc8_table() {

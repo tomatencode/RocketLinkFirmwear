@@ -1,4 +1,4 @@
-#include "bridge.hpp"
+#include "Bridge.hpp"
 
 void Bridge::poll() {
     while (_usbSerial.available()) {

@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "hc12.hpp"
+#include "HC12.hpp"
 
 HC12::HC12(int setPin, int rxPin, int txPin, int baudRate, std::function<void()> onSendCallback, std::function<void()> onReceiveCallback)
     : _setPin(setPin), _rxPin(rxPin), _txPin(txPin), _baudRate(baudRate), _onSendCallback(onSendCallback), _onReceiveCallback(onReceiveCallback), _serial(_rxPin, _txPin), _atState(ATState::IDLE) {

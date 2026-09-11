@@ -1,6 +1,6 @@
 #pragma once
-#include "../hardwear/hc12.hpp"
-#include "protocol.hpp"
+#include "../hardwear/HC12.hpp"
+#include "Protocol.hpp"
 #include <Arduino.h>
 
 class Bridge {
