@@ -69,7 +69,7 @@ void Bridge::handlePacket(const Protocol::Packet& packet) {
             break;
         case Protocol::Type::RADIO_SEND:
             {
-                boolean success = _hc12.send({packet.payload, packet.len});
+                bool success = _hc12.send({packet.payload, packet.len});
 
                 Protocol::Packet responsePacket;
                 responsePacket.type = success ? Protocol::Type::RADIO_SEND_QUEUED : Protocol::Type::RADIO_SEND_FAILED;
