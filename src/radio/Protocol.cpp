@@ -26,7 +26,7 @@ uint8_t crc8(const Protocol::Packet& packet) {
 void Protocol::feed(Parser& parser, uint8_t byte) {
     switch (parser.state) {
         case Parser::State::SOF:
-            if (byte == 0xAA) {
+            if (byte == Protocol::sof) {
                 parser.state = Parser::State::TYPE;
                 parser.cursor = 0;
                 parser.ready = false;
@@ -96,7 +96,7 @@ std::optional<Protocol::Frame> Protocol::encode(const Packet& packet) {
         return std::nullopt;
     }
     Frame frame;
-    frame.bytes[0] = 0xAA; // Start of Frame
+    frame.bytes[0] = Protocol::sof; // Start of Frame
     frame.bytes[1] = static_cast<uint8_t>(packet.type);
     frame.bytes[2] = static_cast<uint8_t>(packet.len & 0xFF);
     frame.bytes[3] = static_cast<uint8_t>((packet.len >> 8) & 0xFF);

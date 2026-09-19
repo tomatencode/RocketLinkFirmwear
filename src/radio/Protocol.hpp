@@ -6,6 +6,7 @@
 namespace Protocol {
 
 static constexpr uint16_t max_payload_size = 1024;
+static constexpr uint8_t sof = 0x7E;
 
 struct Frame {
     std::array<uint8_t, 5 + max_payload_size> bytes;
